@@ -6,4 +6,8 @@ from keras.layers import Activation
 
 # build a LSTM model class:
 class LSTM:
-    def wetnet:
+    @staticmethod
+    def wet_net:
+        # initialise model
+        model = Sequential()
+        inputShape = (height, width, depth)

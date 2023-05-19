@@ -1,17 +1,5 @@
-`%>%`  <- magrittr::`%>%`
-load("Data/stat_loc.RData")
-wd <- readr::read_csv("Data/WDdat_bysite_2022-09-16.csv") %>%
-  dplyr::select(site_id, station_id, date_time, rain, wind_speed, wind_dir, "temp"= est_temp, "rh" = est_rh, leaf_wetness) %>%
-  dplyr::mutate(
-    rain = ifelse(rain < 0, NA, rain),
-    rh = ifelse(rh < 0, NA, rh),
-    wind_speed = ifelse(wind_speed < 0, NA, wind_speed),
-    wind_dir = ifelse(wind_dir < 0, NA, wind_dir),
-    leaf_wetness = ifelse(leaf_wetness < 0, NA, leaf_wetness)
-  ) %>% 
-  dplyr::left_join(station_locations %>% dplyr::select(station_id, "lat" = station_lat, "lon" = station_lon),
-                   by = "station_id")
 
+readr::read_csv("Data/weather_data.csv")
 # --------------------------------------------------------------------------------------------------------------------------------------
 # Find re-scale values of weather data:
 # --------------------------------------------------------------------------------------------------------------------------------------
@@ -59,8 +47,16 @@ summary(wd1)
 #x[1]
 
 
+# --------------------------------------------------------------------------------------------------------------------------------------
+# investigate
+# --------------------------------------------------------------------------------------------------------------------------------------
 
-
+x <- wd %>%
+  dplyr::group_by(site_id) %>%
+  dplyr::summarise(
+    n = dplyr::n(),
+    Y_isNA = sum(!leaf_wetness %in% c(0, 1))
+  )
 
 weather_data[weather_data$station_id == 328,] %>% summary()
 
