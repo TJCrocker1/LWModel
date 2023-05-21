@@ -91,7 +91,7 @@ mod = tf.keras.Sequential([
 
 # LSTM network:
 mod = tf.keras.Sequential([
-    tf.keras.layers.LSTM(32, ),
+    tf.keras.layers.LSTM(32),
     tf.keras.layers.Dense(units = 1)
 ])
 

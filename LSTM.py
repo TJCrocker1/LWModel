@@ -5,9 +5,5 @@ from keras.layers import LSTM
 from keras.layers import Activation
 
 # build a LSTM model class:
-class LSTM:
-    @staticmethod
-    def wet_net:
-        # initialise model
-        model = Sequential()
-        inputShape = (height, width, depth)
+class LSTM():
+    self.model

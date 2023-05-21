@@ -4,19 +4,19 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 
-wd = pd.read_csv("Data/weather_data_clean.csv")
-wd = wd[['time_diff', 'azimuth', 'elevation',
-         'windX', 'windY', 'temp', 'rh',
-         'rain', 'leaf_wetness']]
-train_df = wd.iloc[:600000,:]
-val_df = wd.iloc[600000:700000,:]
-test_df = wd.iloc[700000:,:]
+#wd = pd.read_csv("Data/weather_data_clean.csv")
+#wd = wd[['time_diff', 'azimuth', 'elevation',
+#         'windX', 'windY', 'temp', 'rh',
+#         'rain', 'leaf_wetness']]
+#train_df = wd.iloc[:600000,:]
+#val_df = wd.iloc[600000:700000,:]
+#test_df = wd.iloc[700000:,:]
 
 #print(wd.columns)
 
 class WindowGenerator():
     def __init__(self, input_width, label_width, shift,
-                 train_df = train_df, val_df = val_df, test_df = test_df,
+                 train_df, val_df, test_df,
                  label_columns = None):
 
         self.train_df = train_df
