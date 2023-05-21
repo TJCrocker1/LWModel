@@ -1,4 +1,5 @@
 # a generator function
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -57,9 +58,9 @@ class WindowGenerator():
         if self.label_columns is not None:
             labels = tf.stack(
                 [labels[:, :, self.column_indices[name]] for name in self.label_columns],
-                axis=1
+                axis=-1
             )
-        return labels, inputs
+        return inputs, labels
 
     def make_dataset(self, data):
         data = np.array(data, dtype=np.float32)
@@ -68,11 +69,43 @@ class WindowGenerator():
             targets = None,
             sequence_length = self.total_window_size,
             sequence_stride = 1,
-            shuffle = True, # ??? thing says shuffel is true but i don't think that's right
-            batch_size = 32 # this must refer to something other than the batch size we feed to LSTM
+            shuffle = True, # ??? shuffels batch not time series sequence
+            batch_size = 32 # this is the batch size produced by the data set
         )
         ds = ds.map(self.split_window)
         return ds
+
+    def plot(self, model=None, plot_col='temp', max_subplots=3):
+        inputs, labels = self.example
+        plt.figure(figsize=(12, 8))
+        plot_col_index = self.column_indices[plot_col]
+        max_n = min(max_subplots, len(inputs))
+        for n in range(max_n):
+            plt.subplot(max_n, 1, n + 1)
+            plt.ylabel(f'{plot_col} [normed]')
+            plt.plot(self.input_indices, inputs[n, :, plot_col_index],
+                     label='Inputs', marker='.', zorder=-10)
+
+            if self.label_columns:
+                label_col_index = self.label_columns_indices.get(plot_col, None)
+            else:
+                label_col_index = plot_col_index
+
+            if label_col_index is None:
+                continue
+
+            plt.scatter(self.label_indices, labels[n, :, label_col_index],
+                        edgecolors='k', label='Labels', c='#2ca02c', s=64)
+            if model is not None:
+                predictions = model(inputs)
+                plt.scatter(self.label_indices, predictions[n, :, label_col_index],
+                            marker='X', edgecolors='k', label='Predictions',
+                            c='#ff7f0e', s=64)
+
+            if n == 0:
+                plt.legend()
+
+        plt.xlabel('Time [h]')
 
     @property
     def train(self):
@@ -94,17 +127,17 @@ class WindowGenerator():
             self._example = result
         return result
 
-w1 = WindowGenerator(input_width=24*4, label_width=1, shift=0, label_columns=['leaf_wetness'])
+#w1 = WindowGenerator(input_width=24*4, label_width=1, shift=0, label_columns=['leaf_wetness'])
 #print( w1.train )
 
-example_window = tf.stack([np.array(train_df[:w1.total_window_size]),
-                           np.array(train_df[100:100+w1.total_window_size]),
-                           np.array(train_df[200:200+w1.total_window_size])
-                           ])
+#example_window = tf.stack([np.array(train_df[:w1.total_window_size]),
+#                           np.array(train_df[100:100+w1.total_window_size]),
+#                           np.array(train_df[200:200+w1.total_window_size])
+#                           ])
 
-for example_labels, example_inputs in w1.train.take(1):
-  print(f'Inputs shape (batch, time, features): {example_inputs.shape}')
-  print(f'Labels shape (batch, time, features): {example_labels.shape}')
+#for example_labels, example_inputs in w1.train.take(1):
+#  print(f'Inputs shape (batch, time, features): {example_inputs.shape}')
+#  print(f'Labels shape (batch, time, features): {example_labels.shape}')
 
 
 
