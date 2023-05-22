@@ -147,6 +147,11 @@ wd <- wd %>%
 # write out:
 # --------------------------------------------------------------------------------------------------------------------------------------
 
+wd <- wd %>%
+  dplyr::group_by(group) %>% 
+  dplyr::filter(dplyr::n() > 32) %>%
+  dplyr::ungroup()
+
 readr::write_csv(wd, path = "../Data/weather_data.csv")
 
 readr::write_csv(wd[wd$set == "train", ], "../Data/weather_data_train.csv")
@@ -157,6 +162,17 @@ readr::write_csv(wd[wd$set == "test", ], "../Data/weather_data_test.csv")
 # --------------------------------------------------------------------------------------------------------------------------------------
 # muck about
 # --------------------------------------------------------------------------------------------------------------------------------------
+
+x <- wd %>%
+  dplyr::group_by(group) %>% 
+  dplyr::filter(dplyr::n() > 32)
+
+x %>%
+  dplyr::summarise(
+    n = dplyr::n()
+  )
+
+x %>% dplyr::filter(n < 4)
 
 wd_val <- wd[wd$set == "val", ]
 
